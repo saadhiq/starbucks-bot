@@ -1,3 +1,4 @@
+import json
 import os
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
@@ -38,8 +39,10 @@ def get_menu(query: str) -> str:
     """Gets menu information including drinks, sizes and prices from the Starbucks menu sheet.
     Use this when the user asks about menu items, prices, or available options."""
     
-    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-    creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
+    # Read from environment variable instead of file
+    creds_json = json.loads(os.getenv("GOOGLE_CREDENTIALS"))
+    creds = Credentials.from_service_account_info(creds_json, scopes=scopes)
+    
     client = gspread.authorize(creds)
     
     # Replace with your actual Google Sheet ID
