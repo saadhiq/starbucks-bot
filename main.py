@@ -14,6 +14,10 @@ from langgraph.checkpoint.mongodb import MongoDBSaver
 from pymongo import MongoClient
 
 
+import gspread
+from google.oauth2.service_account import Credentials
+
+
 
 
 load_dotenv()
@@ -27,6 +31,27 @@ def create_order(drink: str, size: str, milk: str, temperature: str) -> str:
 
 # Bind the tool to the LLM
 llm_with_tools = llm.bind_tools([create_order])
+
+
+@tool
+def get_menu(query: str) -> str:
+    """Gets menu information including drinks, sizes and prices from the Starbucks menu sheet.
+    Use this when the user asks about menu items, prices, or available options."""
+    
+    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
+    client = gspread.authorize(creds)
+    
+    # Replace with your actual Google Sheet ID
+    sheet = client.open_by_key("1ppPRM0kWpfStCNdnNhj3twBJX3lS7n_vk1VEtVtKcks").sheet1
+    data = sheet.get_all_records()
+    
+    # Convert to readable text for LLM
+    menu_text = "Starbucks Menu:\n"
+    for row in data:
+        menu_text += f"- {row['Drink']} ({row['Size']}): {row['Price']} | Milk options: {row['Milk Options']}\n"
+    
+    return menu_text
 
 
 def agent_node(state):
@@ -50,7 +75,7 @@ class OrderState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], operator.add]
 
 # Step 2 — Define tool node
-tool_node = ToolNode([create_order])
+tool_node = ToolNode([create_order, get_menu])
 
 # Step 3 — Define routing logic
 def should_continue(state):
