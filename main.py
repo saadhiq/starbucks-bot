@@ -74,7 +74,15 @@ graph.add_edge("tools", "agent")
 # print("Agent node ready")
 
 # MongoDB memory
-client = MongoClient(os.getenv("MONGODB_URI"))
+# client = MongoClient(os.getenv("MONGODB_URI"))
+
+client = MongoClient(
+    os.getenv("MONGODB_URI"),
+    tls=True,
+    tlsAllowInvalidCertificates=True
+)
+
+
 checkpointer = MongoDBSaver(client)
 app = graph.compile(checkpointer=checkpointer)
 
