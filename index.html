@@ -236,7 +236,7 @@
             return;
         }
 
-        const res = await fetch("http://127.0.0.1:5000/register", {
+        const res = await fetch("https://starbucks-bot-6ue0.onrender.com/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
@@ -258,7 +258,7 @@
 
         document.getElementById("loginError").textContent = "";
 
-        const res = await fetch("http://127.0.0.1:5000/login", {
+        const res = await fetch("https://starbucks-bot-6ue0.onrender.com/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
@@ -282,7 +282,7 @@
         addMessage(message, "user");
         input.value = "";
 
-        const res = await fetch("http://127.0.0.1:5000/chat", {
+        const res = await fetch("https://starbucks-bot-6ue0.onrender.com/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
